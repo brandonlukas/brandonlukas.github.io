@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lido — Support</title>
+<meta name="description" content="Help and contact for Lido, the workout timer with a pool.">
+<style>
+  :root {
+    --paper: #e9edf3; --ink: #132147; --ink-2: rgba(19, 33, 71, 0.66);
+    --hairline: rgba(19, 33, 71, 0.12); --periwinkle: #5560c4;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #101528; --ink: #e6ecf7; --ink-2: rgba(230, 236, 247, 0.66);
+      --hairline: rgba(230, 236, 247, 0.14); --periwinkle: #8d97e8;
+    }
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--paper); color: var(--ink);
+    font: 17px/1.55 -apple-system, "Helvetica Neue", system-ui, sans-serif;
+    display: flex; justify-content: center;
+  }
+  main { width: min(40rem, 100%); padding: 2rem 1.5rem 4rem; }
+  .brand {
+    display: inline-block; font-size: 15px; font-weight: 800;
+    text-transform: uppercase; letter-spacing: 0.14em;
+    font-stretch: expanded; text-decoration: none; margin-bottom: 3rem;
+  }
+  h1 {
+    font-size: 2rem; font-weight: 800; text-transform: uppercase;
+    letter-spacing: 0.05em; font-stretch: expanded;
+    padding-bottom: 0.9rem; border-bottom: 1px solid var(--ink);
+    margin-bottom: 0.5rem;
+  }
+  .lede { color: var(--ink-2); margin-bottom: 1.5rem; }
+  section { border-top: 1px solid var(--hairline); padding: 1.4rem 0; }
+  section:first-of-type { border-top: none; }
+  h2 { font-size: 17px; font-weight: 650; margin-bottom: 0.4rem; }
+  p { color: var(--ink-2); }
+  p + p { margin-top: 0.4rem; }
+  a { color: inherit; }
+  .contact {
+    background: color-mix(in srgb, var(--ink) 6%, var(--paper));
+    border-radius: 18px; padding: 1.4rem; margin-top: 2rem;
+  }
+  .contact h2 { margin-bottom: 0.3rem; }
+  .footer-row {
+    display: flex; gap: 1.8rem; border-top: 1px solid var(--hairline);
+    padding-top: 1.2rem; margin-top: 3rem;
+    font-size: 13px; color: var(--ink-2);
+  }
+  .footer-row a { text-decoration: none; }
+  .footer-row a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+<main>
+  <a class="brand" href="./">Lido</a>
+  <h1>Support</h1>
+  <p class="lede">Answers to the usual questions — and a person to write
+  to when they don't cover yours.</p>
+
+  <section>
+    <h2>What's the difference between a timed and an untimed workout?</h2>
+    <p>Timed workouts play themselves: each exercise announces itself and
+    counts down, hands-free. Untimed workouts are for the gym — walk
+    through the program at your own pace, or just mark the workout done
+    when you finish. Both earn a toy.</p>
+  </section>
+
+  <section>
+    <h2>Does Lido keep running with the screen locked?</h2>
+    <p>Yes. A playing workout keeps counting with the phone locked or the
+    app in the background, the voice cues keep speaking, and the running
+    timer shows on the Lock Screen and in the Dynamic Island.</p>
+  </section>
+
+  <section>
+    <h2>How do I share a workout?</h2>
+    <p>Open the workout and tap the share icon. It travels as a link:
+    a friend with Lido taps it and gets the program with one Add to
+    Library button. The workout data rides inside the link itself — it
+    never touches a server.</p>
+  </section>
+
+  <section>
+    <h2>What's the golden toy?</h2>
+    <p>Roughly one finish in twenty comes up gilded. It means nothing and
+    changes nothing. Lucky you.</p>
+  </section>
+
+  <section>
+    <h2>Where does my data live? How do I delete it?</h2>
+    <p>Everything is on your iPhone — there's no account and no server.
+    Delete a workout or a logbook entry in the app to remove it; delete
+    the app to remove everything. See the
+    <a href="privacy.html">privacy policy</a> for the whole story (it's
+    short).</p>
+  </section>
+
+  <div class="contact">
+    <h2>Still stuck, found a bug, or have an idea?</h2>
+    <p>Write to <a href="mailto:lidoworkoutapp@gmail.com">lidoworkoutapp@gmail.com</a>
+    — it lands with the person who made the app. Including your iOS
+    version and what you expected to happen makes fixes faster.</p>
+  </div>
+
+  <div class="footer-row">
+    <a href="./">Lido</a>
+    <a href="privacy.html">Privacy</a>
+    <a href="https://apps.apple.com/us/app/lido-workout-timer/id6787555002">App Store</a>
+  </div>
+</main>
+</body>
+</html>
