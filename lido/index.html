@@ -7,7 +7,7 @@
 <meta name="description" content="Timed workouts that play themselves, a rest counter for the gym, and a pool where every finished workout floats a toy in.">
 <meta property="og:title" content="Lido">
 <meta property="og:description" content="A workout timer with a pool. Every finished workout floats a toy in.">
-<meta property="og:image" content="https://brandonlukas.github.io/lido/img/pool.png">
+<meta property="og:image" content="https://brandonlukas.github.io/lido/img/home.png">
 <style>
   :root {
     --paper: #e9edf3; --ink: #132147; --ink-2: rgba(19, 33, 71, 0.66);
@@ -58,12 +58,20 @@
     margin: 0.8rem 0 3rem;
   }
 
-  /* Sections */
-  .shots { display: flex; gap: 1rem; margin: 0 0 2.5rem; }
+  /* Screenshots */
+  .shots { display: flex; gap: 1.2rem; margin: 0 0 2.5rem; }
+  .shots figure { width: calc(50% - 0.6rem); }
   .shots img {
-    width: calc(50% - 0.5rem); border-radius: 18px;
-    border: 1px solid var(--hairline); display: block; height: auto;
+    width: 100%; height: auto; display: block; border-radius: 22px;
+    border: 1px solid var(--hairline);
+    box-shadow: 0 12px 28px rgba(19, 33, 71, 0.12);
   }
+  .shots figcaption {
+    font-size: 12px; font-weight: 600; letter-spacing: 1.5px;
+    text-transform: uppercase; color: var(--ink-2);
+    text-align: center; margin-top: 0.9rem;
+  }
+
   section { border-top: 1px solid var(--hairline); padding: 1.4rem 0; }
   h2 {
     font-size: 12px; font-weight: 600; letter-spacing: 1.5px;
@@ -88,8 +96,14 @@
   </header>
 
   <div class="shots">
-    <img src="img/workout.png" alt="A workout in Lido: a numbered program sheet with a Start button.">
-    <img src="img/pool.png" alt="The July pool: eight toys afloat, one for every finished workout.">
+    <figure>
+      <img src="img/player.png" alt="A workout playing in Lido: big numerals counting down a plank, the screen filled with water.">
+      <figcaption>The program plays itself</figcaption>
+    </figure>
+    <figure>
+      <img src="img/home.png" alt="Lido's home screen: the July pool with eight toys afloat, above the workout library.">
+      <figcaption>Every finish floats a toy in</figcaption>
+    </figure>
   </div>
 
   <section>
@@ -105,10 +119,10 @@
   </section>
 
   <section>
-    <h2>Every finish floats a toy in</h2>
-    <p>The month's record is a pool. Finish a workout and its toy drifts
-    in; a heavy month earns a bigger pool. Nothing counts streaks, and
-    nothing is ever red because you rested.</p>
+    <h2>The month keeps its own record</h2>
+    <p>Finish a workout and its toy drifts into the pool; a heavy month
+    earns a bigger one. Nothing counts streaks, and nothing is ever red
+    because you rested.</p>
   </section>
 
   <section>
@@ -137,25 +151,28 @@
   var canvas = document.getElementById("pool");
   var ctx = canvas.getContext("2d");
   var stillPose = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var TAU = Math.PI * 2;
 
   document.getElementById("month").textContent =
     new Date().toLocaleString("en", { month: "long" });
 
-  var WATER = "#3465ae", DEEP = "#27508f", GROUT = "rgba(39, 80, 143, 0.55)",
-      CHROME = "#edf3fa";
+  var WATER = "#3465ae", GROUT = "rgba(39, 80, 143, 0.55)", CHROME = "#edf3fa";
 
-  // anchor (unit), amplitude (px), angular speeds (rad/s), phases.
-  function floater(kind, ax, ay, amp, tempo, phase, scale) {
-    return { kind: kind, ax: ax, ay: ay, amp: amp, s: scale,
-             w1: 0.08 * tempo, w2: 0.15 * tempo, p1: phase, p2: phase * 1.7 };
+  function floater(kind, ax, ay, amp, tempo, phase, scale, shiny) {
+    return { kind: kind, ax: ax, ay: ay, amp: amp, s: scale, shiny: !!shiny,
+             ripple: 8 + (phase % 7),
+             w1: 0.09 * tempo, w2: 0.16 * tempo, p1: phase, p2: phase * 1.7 };
   }
   var toys = [
-    floater("duck", 0.20, 0.32, 26, 1.2, 0.9, 1),
-    floater("ball", 0.74, 0.24, 22, 1.0, 3.6, 1),
-    floater("ring", 0.46, 0.64, 24, 0.75, 5.1, 1),
-    floater("lilo", 0.85, 0.66, 18, 0.5, 2.2, 1),
-    floater("duck", 0.60, 0.46, 20, 1.1, 4.4, 0.85)
+    floater("duck",     0.17, 0.28, 34, 1.25, 0.9, 1),
+    floater("ball",     0.72, 0.20, 30, 1.0,  3.6, 1),
+    floater("ring",     0.40, 0.58, 30, 0.8,  5.1, 1),
+    floater("lilo",     0.86, 0.60, 22, 0.55, 2.2, 1),
+    floater("flamingo", 0.28, 0.78, 28, 0.7,  1.6, 1),
+    floater("orca",     0.57, 0.40, 32, 0.95, 4.4, 1),
+    floater("duck",     0.66, 0.80, 26, 1.15, 5.8, 0.9, true)
   ];
+  var directional = { duck: 1, lilo: 1, flamingo: 1, orca: 1 };
 
   function pos(f, t, w, h) {
     return {
@@ -172,70 +189,145 @@
   function silhouette(kind) {
     ctx.beginPath();
     if (kind === "duck") {
-      ctx.ellipse(-1, 0, 12, 8, 0, 0, 7);
-      ctx.moveTo(17, 0); ctx.arc(12, 0, 5.5, 0, 7);
-    } else if (kind === "ball") { ctx.arc(0, 0, 13, 0, 7); }
-    else if (kind === "ring") { ctx.arc(0, 0, 13.5, 0, 7); }
-    else { roundRect(-17, -10, 34, 20, 5); }
+      ctx.ellipse(-1, 0, 12, 8, 0, 0, TAU);
+      ctx.moveTo(17, 0); ctx.arc(12, 0, 5.5, 0, TAU);
+    } else if (kind === "ball") { ctx.arc(0, 0, 13, 0, TAU); }
+    else if (kind === "ring") { ctx.arc(0, 0, 13.5, 0, TAU); }
+    else if (kind === "flamingo") {
+      ctx.ellipse(-2, 0, 12, 12, 0, 0, TAU);
+      ctx.moveTo(20, 0); ctx.ellipse(15.5, 0, 5.2, 4.2, 0, 0, TAU);
+    } else if (kind === "orca") {
+      ctx.ellipse(0, 0, 14, 8, 0, 0, TAU);
+      ctx.moveTo(-14, 0); ctx.ellipse(-16, 0, 4.5, 6, 0, 0, TAU);
+    } else { ctx.roundRect(-17, -10, 34, 20, 5); }
     ctx.fill();
   }
-  function roundRect(x, y, w, h, r) {
-    ctx.beginPath(); ctx.roundRect(x, y, w, h, r);
+
+  function drawDuck(shiny) {
+    var body = shiny ? "#f2ecdd" : "#eebc3a",
+        shade = shiny ? "rgba(160,140,95,0.45)" : "rgba(180,130,20,0.45)",
+        tail = shiny ? "#d8cdb4" : "#d9a323",
+        beak = shiny ? "#d9b25a" : "#e07a2f";
+    ctx.fillStyle = tail;
+    ctx.beginPath(); ctx.moveTo(-9, -3.6); ctx.lineTo(-15.5, 0); ctx.lineTo(-9, 3.6); ctx.fill();
+    ctx.fillStyle = body;
+    ctx.beginPath(); ctx.ellipse(-1, 0, 12, 8, 0, 0, TAU); ctx.fill();
+    ctx.save(); ctx.beginPath(); ctx.ellipse(-1, 0, 12, 8, 0, 0, TAU); ctx.clip();
+    ctx.fillStyle = shade; ctx.fillRect(-13, 0, 26, 8); ctx.restore();
+    ctx.fillStyle = body;
+    ctx.beginPath(); ctx.arc(12, 0, 5.5, 0, TAU); ctx.fill();
+    ctx.fillStyle = beak;
+    ctx.beginPath(); ctx.moveTo(16, -2.4); ctx.lineTo(21.5, 0); ctx.lineTo(16, 2.4); ctx.fill();
+    ctx.fillStyle = "#20242b";
+    ctx.beginPath(); ctx.arc(12.4, -3.2, 1.1, 0, TAU); ctx.arc(12.4, 3.2, 1.1, 0, TAU); ctx.fill();
+    ctx.fillStyle = "rgba(255,255,255,0.55)";
+    ctx.beginPath(); ctx.ellipse(9.5, -3.4, 1.9, 1.1, 0, 0, TAU); ctx.fill();
   }
-  function drawToy(kind) {
-    if (kind === "duck") {
-      ctx.fillStyle = "#d9a323";                       // tail + shade
-      ctx.beginPath(); ctx.moveTo(-9, -3.6); ctx.lineTo(-15.5, 0); ctx.lineTo(-9, 3.6); ctx.fill();
-      ctx.fillStyle = "#eebc3a";                       // hull
-      ctx.beginPath(); ctx.ellipse(-1, 0, 12, 8, 0, 0, 7); ctx.fill();
-      ctx.save(); ctx.beginPath(); ctx.ellipse(-1, 0, 12, 8, 0, 0, 7); ctx.clip();
-      ctx.fillStyle = "rgba(180, 130, 20, 0.45)"; ctx.fillRect(-13, 0, 26, 8); ctx.restore();
-      ctx.fillStyle = "#eebc3a";                       // head
-      ctx.beginPath(); ctx.arc(12, 0, 5.5, 0, 7); ctx.fill();
-      ctx.fillStyle = "#e07a2f";                       // beak
-      ctx.beginPath(); ctx.moveTo(16, -2.4); ctx.lineTo(21.5, 0); ctx.lineTo(16, 2.4); ctx.fill();
-      ctx.fillStyle = "#20242b";                       // eyes
-      ctx.beginPath(); ctx.arc(12.4, -3.2, 1.1, 0, 7); ctx.arc(12.4, 3.2, 1.1, 0, 7); ctx.fill();
-      ctx.fillStyle = "rgba(255,255,255,0.55)";        // catch-light
-      ctx.beginPath(); ctx.ellipse(9.5, -3.4, 1.9, 1.1, 0, 0, 7); ctx.fill();
-    } else if (kind === "ball") {
-      var panels = ["#fff", "#c9504a", "#fff", "#3b5fa8", "#fff", "#e2b23c"];
-      for (var i = 0; i < 6; i++) {
-        ctx.fillStyle = panels[i];
-        ctx.beginPath(); ctx.moveTo(0, 0);
-        ctx.arc(0, 0, 13, i * Math.PI / 3, (i + 1) * Math.PI / 3); ctx.fill();
-      }
-      ctx.fillStyle = "#fff"; ctx.beginPath(); ctx.arc(0, 0, 3.2, 0, 7); ctx.fill();
-      ctx.fillStyle = "rgba(255,255,255,0.5)";
-      ctx.beginPath(); ctx.ellipse(-5, -7.5, 3, 1.8, 0, 0, 7); ctx.fill();
-    } else if (kind === "ring") {
-      ctx.fillStyle = "#fff";
-      ctx.beginPath(); ctx.arc(0, 0, 13.5, 0, 7); ctx.arc(0, 0, 7, 0, 7, true); ctx.fill();
-      ctx.save();
-      ctx.beginPath(); ctx.arc(0, 0, 13.5, 0, 7); ctx.arc(0, 0, 7, 0, 7, true); ctx.clip();
-      ctx.fillStyle = "#c9504a";
-      for (var a = Math.PI / 8; a < 2 * Math.PI; a += Math.PI / 2) {
-        ctx.beginPath(); ctx.moveTo(0, 0); ctx.arc(0, 0, 15, a, a + Math.PI / 4); ctx.fill();
-      }
-      ctx.restore();
-      ctx.strokeStyle = "rgba(32,36,43,0.12)"; ctx.lineWidth = 1.2;
-      ctx.beginPath(); ctx.arc(0, 0, 7, 0, 7); ctx.stroke();
-      ctx.fillStyle = "rgba(255,255,255,0.7)";
-      ctx.beginPath(); ctx.ellipse(-6, -9, 3.5, 1.8, 0, 0, 7); ctx.fill();
-    } else { // lilo
-      ctx.fillStyle = "#eef3f8"; roundRect(-17, -10, 34, 20, 5); ctx.fill();
-      ctx.save(); roundRect(-17, -10, 34, 20, 5); ctx.clip();
-      ctx.strokeStyle = "rgba(52,101,174,0.5)"; ctx.lineWidth = 1.3;
-      for (var y = -5; y <= 5; y += 5) {
-        ctx.beginPath(); ctx.moveTo(-17, y); ctx.lineTo(12, y); ctx.stroke();
-      }
-      ctx.fillStyle = "rgba(52,101,174,0.35)"; ctx.fillRect(12, -10, 5.5, 20);
-      ctx.restore();
-      ctx.strokeStyle = "rgba(52,101,174,0.45)"; ctx.lineWidth = 1.2;
-      roundRect(-17, -10, 34, 20, 5); ctx.stroke();
-      ctx.fillStyle = "rgba(255,255,255,0.8)";
-      ctx.beginPath(); ctx.ellipse(-8, -6.5, 4, 1.7, 0, 0, 7); ctx.fill();
+  function drawBall() {
+    var panels = ["#fff", "#c9504a", "#fff", "#3b5fa8", "#fff", "#e2b23c"];
+    for (var i = 0; i < 6; i++) {
+      ctx.fillStyle = panels[i];
+      ctx.beginPath(); ctx.moveTo(0, 0);
+      ctx.arc(0, 0, 13, i * Math.PI / 3, (i + 1) * Math.PI / 3); ctx.fill();
     }
+    ctx.fillStyle = "#fff"; ctx.beginPath(); ctx.arc(0, 0, 3.2, 0, TAU); ctx.fill();
+    ctx.fillStyle = "rgba(255,255,255,0.5)";
+    ctx.beginPath(); ctx.ellipse(-5, -7.5, 3, 1.8, 0, 0, TAU); ctx.fill();
+  }
+  function drawRing() {
+    ctx.fillStyle = "#fff";
+    ctx.beginPath(); ctx.arc(0, 0, 13.5, 0, TAU); ctx.arc(0, 0, 7, 0, TAU, true); ctx.fill();
+    ctx.save();
+    ctx.beginPath(); ctx.arc(0, 0, 13.5, 0, TAU); ctx.arc(0, 0, 7, 0, TAU, true); ctx.clip();
+    ctx.fillStyle = "#c9504a";
+    for (var a = Math.PI / 8; a < TAU; a += Math.PI / 2) {
+      ctx.beginPath(); ctx.moveTo(0, 0); ctx.arc(0, 0, 15, a, a + Math.PI / 4); ctx.fill();
+    }
+    ctx.restore();
+    ctx.strokeStyle = "rgba(32,36,43,0.12)"; ctx.lineWidth = 1.2;
+    ctx.beginPath(); ctx.arc(0, 0, 7, 0, TAU); ctx.stroke();
+    ctx.fillStyle = "rgba(255,255,255,0.7)";
+    ctx.beginPath(); ctx.ellipse(-6, -9, 3.5, 1.8, 0, 0, TAU); ctx.fill();
+  }
+  function drawLilo() {
+    ctx.fillStyle = "#eef3f8";
+    ctx.beginPath(); ctx.roundRect(-17, -10, 34, 20, 5); ctx.fill();
+    ctx.save(); ctx.beginPath(); ctx.roundRect(-17, -10, 34, 20, 5); ctx.clip();
+    ctx.strokeStyle = "rgba(52,101,174,0.5)"; ctx.lineWidth = 1.3;
+    for (var y = -5; y <= 5; y += 5) {
+      ctx.beginPath(); ctx.moveTo(-17, y); ctx.lineTo(12, y); ctx.stroke();
+    }
+    ctx.fillStyle = "rgba(52,101,174,0.35)"; ctx.fillRect(12, -10, 5.5, 20);
+    ctx.restore();
+    ctx.strokeStyle = "rgba(52,101,174,0.45)"; ctx.lineWidth = 1.2;
+    ctx.beginPath(); ctx.roundRect(-17, -10, 34, 20, 5); ctx.stroke();
+    ctx.fillStyle = "rgba(255,255,255,0.8)";
+    ctx.beginPath(); ctx.ellipse(-8, -6.5, 4, 1.7, 0, 0, TAU); ctx.fill();
+  }
+  function drawFlamingo() {
+    var pink = "#f2a0b8", deep = "#d56f92";
+    ctx.fillStyle = pink;
+    ctx.beginPath(); ctx.arc(-2, 0, 12, 0, TAU); ctx.arc(-2, 0, 6, 0, TAU, true); ctx.fill();
+    ctx.strokeStyle = "rgba(213,111,146,0.6)"; ctx.lineWidth = 1.2;
+    ctx.beginPath(); ctx.arc(-2, 0, 6, 0, TAU); ctx.stroke();
+    ctx.fillStyle = deep;
+    ctx.beginPath(); ctx.moveTo(-12, -4); ctx.lineTo(-19, -7.5); ctx.lineTo(-12.5, 0); ctx.fill();
+    ctx.strokeStyle = pink; ctx.lineWidth = 5; ctx.lineCap = "round";
+    ctx.beginPath(); ctx.moveTo(5, -5.5); ctx.quadraticCurveTo(12.5, -6, 14, 0); ctx.stroke();
+    ctx.fillStyle = pink;
+    ctx.beginPath(); ctx.ellipse(15.5, 0, 5.2, 4.2, 0, 0, TAU); ctx.fill();
+    ctx.fillStyle = "#f2f1ea";
+    ctx.beginPath(); ctx.moveTo(20, -2.2);
+    ctx.quadraticCurveTo(24.6, -2, 24.8, 0); ctx.quadraticCurveTo(24.6, 2, 20, 2.2); ctx.fill();
+    ctx.fillStyle = "#20242b";
+    ctx.beginPath(); ctx.arc(23.4, 0, 1.5, 0, TAU); ctx.fill();
+    ctx.beginPath(); ctx.arc(15, -2.2, 0.9, 0, TAU); ctx.arc(15, 2.2, 0.9, 0, TAU); ctx.fill();
+    ctx.fillStyle = "rgba(255,255,255,0.45)";
+    ctx.beginPath(); ctx.ellipse(-6, -9, 3.2, 1.7, 0, 0, TAU); ctx.fill();
+  }
+  function drawOrca() {
+    var hide = "#232833";
+    ctx.fillStyle = hide;
+    ctx.beginPath(); ctx.moveTo(-12, 0);
+    ctx.quadraticCurveTo(-14, -1.5, -19.5, -5.5); ctx.quadraticCurveTo(-16.5, -1, -14.5, 0);
+    ctx.quadraticCurveTo(-16.5, 1, -19.5, 5.5); ctx.quadraticCurveTo(-14, 1.5, -12, 0); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(0, 0, 14, 8, 0, 0, TAU); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(1, -9.3, 4, 2.4, 0, 0, TAU);
+    ctx.ellipse(1, 9.3, 4, 2.4, 0, 0, TAU); ctx.fill();
+    ctx.fillStyle = "rgba(255,255,255,0.92)";
+    ctx.beginPath(); ctx.ellipse(8, -4.6, 2.7, 1.6, 0, 0, TAU);
+    ctx.ellipse(8, 4.6, 2.7, 1.6, 0, 0, TAU); ctx.fill();
+    ctx.fillStyle = "rgba(255,255,255,0.35)";
+    ctx.beginPath(); ctx.ellipse(-5.5, 0, 2.5, 2.2, 0, 0, TAU); ctx.fill();
+    ctx.fillStyle = "rgba(0,0,0,0.5)";
+    ctx.beginPath(); ctx.roundRect(-4, -1.4, 9, 2.8, 1.4); ctx.fill();
+    ctx.fillStyle = "rgba(255,255,255,0.4)";
+    ctx.beginPath(); ctx.ellipse(4, -6.2, 3, 1.5, 0, 0, TAU); ctx.fill();
+  }
+  function drawToy(kind, shiny) {
+    if (kind === "duck") drawDuck(shiny);
+    else if (kind === "ball") drawBall();
+    else if (kind === "ring") drawRing();
+    else if (kind === "lilo") drawLilo();
+    else if (kind === "flamingo") drawFlamingo();
+    else drawOrca();
+  }
+
+  // The gilded toy's four-point twinkle — fires once per period.
+  function drawGlint(x, y, t, phase, s) {
+    var cycle = (t * 0.85 + phase) % 6.5;
+    if (cycle > 1.1) return;
+    var pulse = Math.sin(Math.PI * cycle / 1.1), k = s * (0.5 + 0.5 * pulse);
+    ctx.save();
+    ctx.globalAlpha = 0.9 * pulse;
+    ctx.translate(x + 9 * s, y - 11 * s); ctx.scale(k, k);
+    ctx.strokeStyle = "#fff"; ctx.lineCap = "round"; ctx.lineWidth = 1.3;
+    ctx.beginPath(); ctx.moveTo(-4.5, 0); ctx.lineTo(4.5, 0);
+    ctx.moveTo(0, -4.5); ctx.lineTo(0, 4.5); ctx.stroke();
+    ctx.globalAlpha = 0.7 * pulse; ctx.lineWidth = 0.9;
+    ctx.beginPath(); ctx.moveTo(-1.7, -1.7); ctx.lineTo(1.7, 1.7);
+    ctx.moveTo(-1.7, 1.7); ctx.lineTo(1.7, -1.7); ctx.stroke();
+    ctx.restore();
   }
 
   function draw(t) {
@@ -249,15 +341,15 @@
     ctx.fillStyle = depth; ctx.fillRect(0, 0, w, h);
 
     // Caustic light and cloud shade drifting through.
-    var blobs = [[0.25, 0.35, 0.35, "rgba(255,255,255,0.07)"],
-                 [0.7, 0.6, 0.4, "rgba(255,255,255,0.06)"],
-                 [0.55, 0.2, 0.45, "rgba(21,45,84,0.16)"]];
+    var blobs = [[0.25, 0.35, 0.35, "rgba(255,255,255,0.09)"],
+                 [0.7, 0.6, 0.4, "rgba(255,255,255,0.07)"],
+                 [0.55, 0.2, 0.45, "rgba(21,45,84,0.18)"]];
     blobs.forEach(function (b, i) {
-      var cx = b[0] * w + Math.sin(t / 47 + i * 2) * 12,
-          cy = b[1] * h + Math.cos(t / 53 + i * 2) * 8, r = b[2] * h;
+      var cx = b[0] * w + Math.sin(t / 41 + i * 2) * 16,
+          cy = b[1] * h + Math.cos(t / 47 + i * 2) * 11, r = b[2] * h;
       var g = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
       g.addColorStop(0, b[3]); g.addColorStop(1, "rgba(0,0,0,0)");
-      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, cy, r, 0, 7); ctx.fill();
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, cy, r, 0, TAU); ctx.fill();
     });
 
     // The grout grid, refracting slowly.
@@ -276,7 +368,7 @@
     }
 
     // Ladder over the top edge.
-    var lx = 0.16 * w;
+    var lx = 0.14 * w;
     ctx.lineCap = "round";
     ctx.strokeStyle = "rgba(237,243,250,0.55)"; ctx.lineWidth = 3.4;
     [lx - 7, lx + 7].forEach(function (rx) {
@@ -289,15 +381,27 @@
 
     toys.forEach(function (f) {
       var p = pos(f, t, w, h);
-      var rot = (f.kind === "duck" || f.kind === "lilo")
-        ? heading(f, t) : t * 0.06 + f.p1;
+
+      // A quiet ripple ring now and then.
+      var age = (t + f.p1 * 3) % f.ripple;
+      if (age < 2.2) {
+        var k = age / 2.2;
+        ctx.strokeStyle = "rgba(255,255,255," + 0.22 * (1 - k) + ")";
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.arc(p.x, p.y, 4 + 18 * k, 0, TAU); ctx.stroke();
+      }
+
+      var rot = directional[f.kind]
+        ? heading(f, t) + Math.sin(t * 2 + f.p1) * 0.035
+        : t * 0.06 + f.p1;
       ctx.save(); ctx.translate(p.x + 5 * f.s, p.y + 7 * f.s);
       ctx.rotate(rot); ctx.scale(f.s, f.s);
       ctx.fillStyle = "rgba(0,0,0,0.13)"; silhouette(f.kind);
       ctx.restore();
       ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(rot); ctx.scale(f.s, f.s);
-      drawToy(f.kind);
+      drawToy(f.kind, f.shiny);
       ctx.restore();
+      if (f.shiny) drawGlint(p.x, p.y, t, f.p1, f.s);
     });
   }
 
