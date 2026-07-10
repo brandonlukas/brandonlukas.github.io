@@ -11,18 +11,55 @@
 <style>
   :root {
     --paper: #e9edf3; --ink: #132147; --ink-2: rgba(19, 33, 71, 0.66);
-    --hairline: rgba(19, 33, 71, 0.12);
+    --hairline: rgba(19, 33, 71, 0.12); --periwinkle: #5560c4;
+    --navy: #132147; --on-navy: #e9edf3;
   }
   @media (prefers-color-scheme: dark) {
     :root {
       --paper: #101528; --ink: #e6ecf7; --ink-2: rgba(230, 236, 247, 0.66);
-      --hairline: rgba(230, 236, 247, 0.14);
+      --hairline: rgba(230, 236, 247, 0.14); --periwinkle: #8d97e8;
+      --navy: #1a2450; --on-navy: #e6ecf7;
     }
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
   body {
     background: var(--paper); color: var(--ink);
-    font: 17px/1.5 -apple-system, "Helvetica Neue", system-ui, sans-serif;
+    font: 17px/1.55 -apple-system, "Helvetica Neue", system-ui, sans-serif;
+  }
+  a { color: inherit; }
+
+  .display {
+    font-weight: 800; text-transform: uppercase;
+    letter-spacing: 0.05em; font-stretch: expanded;
+  }
+  .kicker {
+    font-size: 12px; font-weight: 600; letter-spacing: 1.5px;
+    text-transform: uppercase; color: var(--periwinkle);
+    font-variant-numeric: tabular-nums; margin-bottom: 0.9rem;
+  }
+
+  /* Navigation: white on the water, ink once ashore. */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 20;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0.9rem clamp(1.5rem, 5vw, 4rem);
+    color: #fff; transition: color 0.3s, background 0.3s;
+  }
+  nav .brand {
+    font-size: 15px; text-decoration: none; letter-spacing: 0.14em;
+  }
+  nav .links { display: flex; align-items: center; gap: 1.4rem; }
+  nav .links a { text-decoration: none; font-size: 14px; font-weight: 500; }
+  nav .nav-cta {
+    border: 1px solid currentColor; border-radius: 999px;
+    padding: 0.42rem 1rem;
+  }
+  nav.ashore {
+    color: var(--ink);
+    background: color-mix(in srgb, var(--paper) 82%, transparent);
+    -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--hairline);
   }
 
   /* The poster: the pool is the whole first viewport, type on the water.
@@ -37,24 +74,18 @@
   }
   .hero-content {
     position: absolute; inset: 0;
-    display: flex; flex-direction: column; align-items: flex-start;
-    padding: clamp(1.5rem, 5vw, 4rem);
-  }
-  .overline {
-    font-size: 13px; font-weight: 600; letter-spacing: 1.5px;
-    text-transform: uppercase; color: rgba(255, 255, 255, 0.78);
-    margin-bottom: 1.2rem;
+    display: flex; flex-direction: column; justify-content: center;
+    align-items: flex-start; padding: clamp(1.5rem, 5vw, 4rem);
   }
   h1 {
-    font-size: clamp(2.4rem, 7.5vw, 5rem); line-height: 1.06;
-    font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em;
-    font-stretch: expanded; color: #fff; max-width: 12em;
-    margin-bottom: 2rem; text-wrap: balance;
+    font-size: clamp(2.5rem, 8vw, 5.4rem); line-height: 1.04;
+    color: #fff; max-width: 11em; margin-bottom: 2.2rem;
+    text-wrap: balance;
   }
   .cta {
     display: inline-block; text-decoration: none;
     background: #fff; color: #132147; font-weight: 600;
-    padding: 0.9rem 1.6rem; border-radius: 14px;
+    padding: 0.95rem 1.7rem; border-radius: 14px;
     box-shadow: 0 10px 28px rgba(10, 25, 55, 0.35);
   }
   .pool-label, .pool-note {
@@ -77,51 +108,107 @@
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(7px); }
   }
-  @media (prefers-reduced-motion: reduce) {
-    .scroll-hint { animation: none; }
-  }
 
-  /* The paper below the water, drawn over it like a sheet. */
+  /* The paper, drawn over the water like a sheet. */
   main {
     position: relative; z-index: 1; background: var(--paper);
     border-radius: 26px 26px 0 0;
     box-shadow: 0 -18px 44px rgba(10, 25, 55, 0.35);
-    display: flex; justify-content: center;
   }
-  .column { width: min(46rem, 100%); padding: 3.5rem 1.5rem 4rem; }
-  .shots { display: flex; gap: 1.2rem; margin: 0 0 2.5rem; }
-  .shots figure { width: calc(50% - 0.6rem); }
-  .shots img {
-    width: 100%; height: auto; display: block; border-radius: 22px;
-    border: 1px solid var(--hairline);
-    box-shadow: 0 12px 28px rgba(19, 33, 71, 0.12);
+  .column {
+    width: min(62rem, 100%); margin: 0 auto;
+    padding: 0 clamp(1.5rem, 5vw, 3rem);
   }
-  .shots figcaption {
-    font-size: 12px; font-weight: 600; letter-spacing: 1.5px;
-    text-transform: uppercase; color: var(--ink-2);
-    text-align: center; margin-top: 0.9rem;
+
+  /* Numbered spreads — the app's program sheet, at page scale. */
+  .spread {
+    display: flex; align-items: center; gap: clamp(2rem, 6vw, 4.5rem);
+    padding: clamp(3.5rem, 8vw, 6rem) 0;
   }
-  section { border-top: 1px solid var(--hairline); padding: 1.4rem 0; }
-  h2 {
+  .spread + .spread { border-top: 1px solid var(--hairline); }
+  .spread.reverse { flex-direction: row-reverse; }
+  .spread-copy { flex: 1; }
+  .spread h2 {
+    font-size: clamp(1.5rem, 3.2vw, 2.05rem); line-height: 1.18;
+    font-weight: 650; letter-spacing: -0.01em; margin-bottom: 0.8rem;
+    text-wrap: balance;
+  }
+  .spread p { color: var(--ink-2); max-width: 30em; }
+  .phone {
+    width: min(300px, 36%); height: auto; display: block;
+    border-radius: 26px; border: 1px solid var(--hairline);
+    box-shadow: 0 18px 40px rgba(19, 33, 71, 0.16);
+    rotate: 1.6deg;
+  }
+  .spread.reverse .phone { rotate: -1.6deg; }
+
+  /* The manifesto, ink from edge to edge. */
+  .statement {
+    background: var(--navy); color: var(--on-navy);
+    padding: clamp(4.5rem, 10vw, 7rem) 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .statement-line {
+    font-size: clamp(2rem, 5.6vw, 3.4rem); line-height: 1.1;
+    margin-bottom: 1.2rem; text-wrap: balance;
+  }
+  .statement-sub { color: color-mix(in srgb, var(--on-navy) 70%, transparent); max-width: 34em; }
+
+  /* Quiet closing rows. */
+  .mini { border-top: 1px solid var(--hairline); padding: 1.6rem 0; }
+  .mini:first-child { border-top: none; }
+  .minis { padding-top: 2.4rem; padding-bottom: 1rem; }
+  .mini h3 {
     font-size: 12px; font-weight: 600; letter-spacing: 1.5px;
     text-transform: uppercase; color: var(--ink-2); margin-bottom: 0.5rem;
   }
-  p + p { margin-top: 0.5rem; }
-  a { color: inherit; }
-  .cta-bottom {
-    display: block; text-align: center; text-decoration: none;
-    background: var(--ink); color: var(--paper); font-weight: 500;
-    padding: 1rem; border-radius: 14px; margin-top: 2rem;
+  .mini p { color: var(--ink-2); max-width: 38em; }
+  .mini p + p { margin-top: 0.4rem; }
+
+  footer { padding: clamp(2.5rem, 7vw, 4.5rem) 0 2rem; }
+  .wordmark {
+    display: block; font-size: clamp(4.2rem, 19vw, 12rem);
+    line-height: 0.95; margin-bottom: 1.6rem; color: var(--ink);
   }
-  .footnote { font-size: 13px; color: var(--ink-2); text-align: center; margin-top: 1rem; }
+  .footer-row {
+    display: flex; flex-wrap: wrap; gap: 0.6rem 1.8rem;
+    border-top: 1px solid var(--hairline); padding-top: 1.2rem;
+    font-size: 13px; color: var(--ink-2);
+  }
+  .footer-row a { text-decoration: none; }
+  .footer-row a:hover { text-decoration: underline; }
+  .footer-row .spacer { flex: 1; }
+
+  /* Arrivals surface gently, like everything in Lido. */
+  .reveal { opacity: 0; transform: translateY(14px);
+            transition: opacity 0.7s ease, transform 0.7s ease; }
+  .reveal.in { opacity: 1; transform: none; }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .scroll-hint { animation: none; }
+    .reveal { opacity: 1; transform: none; transition: none; }
+  }
+  @media (max-width: 720px) {
+    .spread, .spread.reverse { flex-direction: column; }
+    .phone { width: min(320px, 78%); }
+  }
 </style>
 </head>
 <body>
+<nav id="topnav">
+  <a class="brand display" href="#">Lido</a>
+  <div class="links">
+    <a href="mailto:lidoworkoutapp@gmail.com">Support</a>
+    <a class="nav-cta" href="https://apps.apple.com/us/app/lido-workout-timer/id6787555002">App&nbsp;Store</a>
+  </div>
+</nav>
+
 <header class="hero">
   <canvas id="pool" aria-label="A grand pool seen from above, toys drifting — one for every finished workout." role="img"></canvas>
   <div class="hero-content">
-    <p class="overline">Lido — for iPhone</p>
-    <h1>A workout timer with a pool.</h1>
+    <h1 class="display">A workout timer with a pool.</h1>
     <a class="cta" href="https://apps.apple.com/us/app/lido-workout-timer/id6787555002">Get Lido on the App&nbsp;Store</a>
   </div>
   <span class="pool-label" id="month"></span>
@@ -136,53 +223,77 @@
 
 <main>
   <div class="column">
-    <div class="shots">
-      <figure>
-        <img src="img/player.png" alt="A workout playing in Lido: big numerals counting down a plank, the screen filled with water.">
-        <figcaption>The program plays itself</figcaption>
-      </figure>
-      <figure>
-        <img src="img/home.png" alt="Lido's home screen: the July pool with eight toys afloat, above the workout library.">
-        <figcaption>Every finish floats a toy in</figcaption>
-      </figure>
+    <section class="spread reveal">
+      <div class="spread-copy">
+        <p class="kicker">01 — Timed</p>
+        <h2>The program plays itself.</h2>
+        <p>Write the workout once. Lido runs it with voice cues — what's
+        next, halfway, five seconds left — so your phone stays in your
+        pocket and your hands stay on the floor.</p>
+      </div>
+      <img class="phone" src="img/player.png" alt="A workout playing in Lido: big numerals counting down a plank, the screen filled with water.">
+    </section>
+
+    <section class="spread reverse reveal">
+      <div class="spread-copy">
+        <p class="kicker">02 — Sets</p>
+        <h2>Rest, counted for you.</h2>
+        <p>For gym workouts you run yourself: tap when a set ends and
+        Lido times the rest, chiming when it's time to lift again. Your
+        sets, reps, and rest are remembered between visits.</p>
+      </div>
+      <img class="phone" src="img/sets.png" alt="Lido's Sets tab: a rest counter with set and rest pickers.">
+    </section>
+
+    <section class="spread reveal">
+      <div class="spread-copy">
+        <p class="kicker">03 — The pool</p>
+        <h2>Every finish floats a toy in.</h2>
+        <p>The month keeps its own record: finish a workout and its toy
+        drifts into the pool. A heavy month earns a grander pool — two
+        ladders, a diving board, the works.</p>
+      </div>
+      <img class="phone" src="img/home.png" alt="Lido's home screen: the July pool with eight toys afloat, above the workout library.">
+    </section>
+  </div>
+
+  <section class="statement">
+    <div class="column reveal">
+      <p class="statement-line display">Nothing counts streaks.</p>
+      <p class="statement-sub">And nothing is ever red because you rested.
+      Lido keeps a record, not a score — a missed day is simply water.</p>
     </div>
+  </section>
 
-    <section>
-      <h2>Timed workouts play themselves</h2>
-      <p>Write the program once. Lido runs it with voice cues — what's next,
-      halfway, five seconds left — so your phone stays in your pocket.</p>
-    </section>
-
-    <section>
-      <h2>Sets, counted for you</h2>
-      <p>For gym workouts you run yourself: tap when a set ends and Lido
-      times the rest, chiming when it's time to lift again.</p>
-    </section>
-
-    <section>
-      <h2>The month keeps its own record</h2>
-      <p>Finish a workout and its toy drifts into the pool; a heavy month
-      earns a bigger one. Nothing counts streaks, and nothing is ever red
-      because you rested.</p>
-    </section>
-
-    <section>
-      <h2>Share a workout</h2>
+  <div class="column minis">
+    <section class="mini reveal">
+      <h3>Share a workout</h3>
       <p>Send a program to a friend as a link. It opens in their Lido,
       ready to add.</p>
     </section>
-
-    <section>
-      <h2>Support</h2>
-      <p>Questions or trouble? Write to
-      <a href="mailto:lidoworkoutapp@gmail.com">lidoworkoutapp@gmail.com</a>.</p>
-      <p>Lido keeps everything on your phone — no account, no ads, no
+    <section class="mini reveal">
+      <h3>Private by construction</h3>
+      <p>Everything lives on your phone — no account, no ads, no
       analytics. Shared workouts travel inside the link itself and never
       touch a server.</p>
     </section>
+    <section class="mini reveal">
+      <h3>Support</h3>
+      <p>Questions or trouble? Write to
+      <a href="mailto:lidoworkoutapp@gmail.com">lidoworkoutapp@gmail.com</a>.</p>
+    </section>
+  </div>
 
-    <a class="cta-bottom" href="https://apps.apple.com/us/app/lido-workout-timer/id6787555002">Get Lido on the App&nbsp;Store</a>
-    <p class="footnote">Made by Brandon Lukas.</p>
+  <div class="column">
+    <footer>
+      <span class="wordmark display" aria-hidden="true">Lido</span>
+      <div class="footer-row">
+        <a href="https://apps.apple.com/us/app/lido-workout-timer/id6787555002">App Store</a>
+        <a href="mailto:lidoworkoutapp@gmail.com">Support</a>
+        <span class="spacer"></span>
+        <span>Made by Brandon Lukas</span>
+      </div>
+    </footer>
   </div>
 </main>
 
@@ -201,22 +312,22 @@
 
   var WATER = "#3465ae", GROUT = "rgba(39, 80, 143, 0.55)", CHROME = "#edf3fa";
 
-  // Anchors keep clear of the top-left, where the poster's type sits.
+  // Anchors keep clear of the left-middle, where the poster's type sits.
   function floater(kind, ax, ay, amp, tempo, phase, scale, shiny) {
     return { kind: kind, ax: ax, ay: ay, amp: amp, s: scale, shiny: !!shiny,
              ripple: 8 + (phase % 7),
              w1: 0.09 * tempo, w2: 0.16 * tempo, p1: phase, p2: phase * 1.7 };
   }
   var toys = [
-    floater("duck",     0.70, 0.24, 34, 1.25, 0.9, 1),
-    floater("lilo",     0.88, 0.42, 24, 0.55, 2.2, 1),
-    floater("ball",     0.58, 0.52, 30, 1.0,  3.6, 1),
-    floater("orca",     0.34, 0.62, 32, 0.95, 4.4, 1),
-    floater("ring",     0.14, 0.76, 28, 0.8,  5.1, 1),
-    floater("flamingo", 0.47, 0.80, 28, 0.7,  1.6, 1),
-    floater("duck",     0.74, 0.76, 26, 1.15, 5.8, 0.9, true),
-    floater("ring",     0.90, 0.66, 22, 0.75, 2.9, 0.85),
-    floater("ball",     0.26, 0.44, 24, 1.05, 4.1, 0.85)
+    floater("duck",     0.70, 0.20, 34, 1.25, 0.9, 1),
+    floater("lilo",     0.88, 0.40, 24, 0.55, 2.2, 1),
+    floater("ball",     0.62, 0.50, 30, 1.0,  3.6, 1),
+    floater("orca",     0.36, 0.78, 32, 0.95, 4.4, 1),
+    floater("ring",     0.14, 0.86, 28, 0.8,  5.1, 1),
+    floater("flamingo", 0.50, 0.86, 28, 0.7,  1.6, 1),
+    floater("duck",     0.76, 0.78, 26, 1.15, 5.8, 0.9, true),
+    floater("ring",     0.90, 0.64, 22, 0.75, 2.9, 0.85),
+    floater("ball",     0.24, 0.14, 24, 1.05, 4.1, 0.85)
   ];
   var directional = { duck: 1, lilo: 1, flamingo: 1, orca: 1 };
 
@@ -473,18 +584,35 @@
     });
   }
 
-  if (stillPose) { draw(137); return; }
-  // Anything unseen is paused — once the paper fully covers the pool,
-  // the water stops asking for frames.
-  var covered = false;
-  new IntersectionObserver(function (entries) {
-    covered = !entries[0].isIntersecting;
-  }).observe(canvas);
-  var last = 0;
-  (function frame(now) {
-    if (!covered && now - last > 41) { last = now; draw(now / 1000); } // ~24fps
-    requestAnimationFrame(frame);
-  })(0);
+  if (stillPose) { draw(137); } else {
+    // Anything unseen is paused — once the paper fully covers the pool,
+    // the water stops asking for frames.
+    var covered = false;
+    new IntersectionObserver(function (entries) {
+      covered = !entries[0].isIntersecting;
+    }).observe(canvas);
+    var last = 0;
+    (function frame(now) {
+      if (!covered && now - last > 41) { last = now; draw(now / 1000); } // ~24fps
+      requestAnimationFrame(frame);
+    })(0);
+  }
+
+  // The nav wades out of the water once the paper arrives.
+  var nav = document.getElementById("topnav");
+  function ashore() {
+    nav.classList.toggle("ashore", window.scrollY > window.innerHeight - 80);
+  }
+  addEventListener("scroll", ashore, { passive: true });
+  ashore();
+
+  // Sections surface as they arrive (pre-shown under Reduce Motion via CSS).
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
+    });
+  }, { threshold: 0.18 });
+  document.querySelectorAll(".reveal").forEach(function (el) { io.observe(el); });
 })();
 </script>
 </body>
