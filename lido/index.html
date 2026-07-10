@@ -25,9 +25,12 @@
     font: 17px/1.5 -apple-system, "Helvetica Neue", system-ui, sans-serif;
   }
 
-  /* The poster: the pool is the whole first viewport, type on the water. */
+  /* The poster: the pool is the whole first viewport, type on the water.
+     Sticky, so the paper below scrolls up OVER it — a sheet drawn across
+     the pool — while the water holds still. */
   .hero {
-    position: relative; height: 100vh; height: 100dvh; min-height: 560px;
+    position: sticky; top: 0; z-index: 0;
+    height: 100vh; height: 100dvh; min-height: 560px;
   }
   .hero canvas {
     position: absolute; inset: 0; width: 100%; height: 100%; display: block;
@@ -65,9 +68,26 @@
     right: clamp(1.5rem, 5vw, 4rem);
     color: rgba(255, 255, 255, 0.6); font-weight: 600; font-size: 12px;
   }
+  .scroll-hint {
+    position: absolute; bottom: 1.2rem; left: 50%; translate: -50% 0;
+    color: rgba(255, 255, 255, 0.7); pointer-events: none;
+    animation: bob 2.4s ease-in-out infinite;
+  }
+  @keyframes bob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(7px); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .scroll-hint { animation: none; }
+  }
 
-  /* The paper below the water. */
-  main { display: flex; justify-content: center; }
+  /* The paper below the water, drawn over it like a sheet. */
+  main {
+    position: relative; z-index: 1; background: var(--paper);
+    border-radius: 26px 26px 0 0;
+    box-shadow: 0 -18px 44px rgba(10, 25, 55, 0.35);
+    display: flex; justify-content: center;
+  }
   .column { width: min(46rem, 100%); padding: 3.5rem 1.5rem 4rem; }
   .shots { display: flex; gap: 1.2rem; margin: 0 0 2.5rem; }
   .shots figure { width: calc(50% - 0.6rem); }
@@ -106,6 +126,12 @@
   </div>
   <span class="pool-label" id="month"></span>
   <span class="pool-note">Free · No account, no ads</span>
+  <span class="scroll-hint" aria-hidden="true">
+    <svg width="18" height="10" viewBox="0 0 18 10" fill="none">
+      <path d="M1 1l8 7 8-7" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </span>
 </header>
 
 <main>
@@ -448,9 +474,15 @@
   }
 
   if (stillPose) { draw(137); return; }
+  // Anything unseen is paused — once the paper fully covers the pool,
+  // the water stops asking for frames.
+  var covered = false;
+  new IntersectionObserver(function (entries) {
+    covered = !entries[0].isIntersecting;
+  }).observe(canvas);
   var last = 0;
   (function frame(now) {
-    if (now - last > 41) { last = now; draw(now / 1000); } // ~24fps
+    if (!covered && now - last > 41) { last = now; draw(now / 1000); } // ~24fps
     requestAnimationFrame(frame);
   })(0);
 })();
