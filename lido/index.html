@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lido — a workout timer with a pool</title>
+<meta name="description" content="Timed workouts that play themselves, a rest counter for the gym, and a pool where every finished workout floats a toy in.">
+<meta property="og:title" content="Lido">
+<meta property="og:description" content="A workout timer with a pool. Every finished workout floats a toy in.">
+<meta property="og:image" content="https://brandonlukas.github.io/lido/img/pool.png">
+<style>
+  :root {
+    --paper: #e9edf3; --ink: #132147; --ink-2: rgba(19, 33, 71, 0.66);
+    --hairline: rgba(19, 33, 71, 0.12); --card: #f7f9fd;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #101528; --ink: #e6ecf7; --ink-2: rgba(230, 236, 247, 0.66);
+      --hairline: rgba(230, 236, 247, 0.14); --card: #171d33;
+    }
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--paper); color: var(--ink);
+    font: 17px/1.5 -apple-system, "Helvetica Neue", system-ui, sans-serif;
+    display: flex; justify-content: center;
+  }
+  main { width: min(44rem, 100%); padding: 3.5rem 1.5rem 4rem; }
+  h1 {
+    font-size: 3rem; font-weight: 800; text-transform: uppercase;
+    letter-spacing: 0.06em; font-stretch: expanded;
+    padding-bottom: 1rem; border-bottom: 1px solid var(--ink);
+    margin-bottom: 1rem;
+  }
+  .tagline { font-size: 1.25rem; margin-bottom: 2.5rem; }
+  .shots { display: flex; gap: 1rem; margin: 0 0 2.5rem; }
+  .shots img {
+    width: calc(50% - 0.5rem); border-radius: 18px;
+    border: 1px solid var(--hairline); display: block;
+  }
+  section { border-top: 1px solid var(--hairline); padding: 1.4rem 0; }
+  h2 {
+    font-size: 12px; font-weight: 600; letter-spacing: 1.5px;
+    text-transform: uppercase; color: var(--ink-2); margin-bottom: 0.5rem;
+  }
+  p + p { margin-top: 0.5rem; }
+  a { color: inherit; }
+  .cta {
+    display: block; text-align: center; text-decoration: none;
+    background: var(--ink); color: var(--paper); font-weight: 500;
+    padding: 1rem; border-radius: 14px; margin: 2rem 0 0.8rem;
+  }
+  .footnote { font-size: 13px; color: var(--ink-2); text-align: center; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Lido</h1>
+  <p class="tagline">A workout timer with a pool.</p>
+
+  <div class="shots">
+    <img src="img/workout.png" alt="A workout in Lido: a numbered program sheet with a Start button.">
+    <img src="img/pool.png" alt="The July pool: eight toys afloat, one for every finished workout.">
+  </div>
+
+  <section>
+    <h2>Timed workouts play themselves</h2>
+    <p>Write the program once. Lido runs it with voice cues — what's next,
+    halfway, five seconds left — so your phone stays in your pocket.</p>
+  </section>
+
+  <section>
+    <h2>Sets, counted for you</h2>
+    <p>For gym workouts you run yourself: tap when a set ends and Lido
+    times the rest, chiming when it's time to lift again.</p>
+  </section>
+
+  <section>
+    <h2>Every finish floats a toy in</h2>
+    <p>The month's record is a pool. Finish a workout and its toy drifts
+    in; a heavy month earns a bigger pool. Nothing counts streaks, and
+    nothing is ever red because you rested.</p>
+  </section>
+
+  <section>
+    <h2>Share a workout</h2>
+    <p>Send a program to a friend as a link. It opens in their Lido,
+    ready to add — <a href="w.html">or right here</a>, if they don't
+    have it yet.</p>
+  </section>
+
+  <section>
+    <h2>Support</h2>
+    <p>Questions or trouble? Write to
+    <a href="mailto:brandonlukas@gmail.com">brandonlukas@gmail.com</a>.</p>
+    <p>Lido keeps everything on your phone — no account, no ads, no
+    analytics. Shared workouts travel inside the link itself and never
+    touch a server.</p>
+  </section>
+
+  <!-- TODO(brandon): replace with the real App Store URL for Lido. -->
+  <a class="cta" href="https://apps.apple.com/app/id0000000000">Get Lido on the App&nbsp;Store</a>
+  <p class="footnote">Free. Made by Brandon Lukas.</p>
+</main>
+</body>
+</html>
