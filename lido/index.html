@@ -23,42 +23,52 @@
   body {
     background: var(--paper); color: var(--ink);
     font: 17px/1.5 -apple-system, "Helvetica Neue", system-ui, sans-serif;
-    display: flex; justify-content: center;
   }
-  main { width: min(46rem, 100%); padding: 3rem 1.5rem 4rem; }
 
-  /* Hero */
+  /* The poster: the pool is the whole first viewport, type on the water. */
+  .hero {
+    position: relative; height: 100vh; height: 100dvh; min-height: 560px;
+  }
+  .hero canvas {
+    position: absolute; inset: 0; width: 100%; height: 100%; display: block;
+  }
+  .hero-content {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: flex-start;
+    padding: clamp(1.5rem, 5vw, 4rem);
+  }
   .overline {
-    font-size: 12px; font-weight: 600; letter-spacing: 1.5px;
-    text-transform: uppercase; color: var(--ink-2); margin-bottom: 1.2rem;
+    font-size: 13px; font-weight: 600; letter-spacing: 1.5px;
+    text-transform: uppercase; color: rgba(255, 255, 255, 0.78);
+    margin-bottom: 1.2rem;
   }
   h1 {
-    font-size: clamp(2.1rem, 7vw, 3.4rem); line-height: 1.08;
+    font-size: clamp(2.4rem, 7.5vw, 5rem); line-height: 1.06;
     font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em;
-    font-stretch: expanded; margin-bottom: 1.8rem;
+    font-stretch: expanded; color: #fff; max-width: 12em;
+    margin-bottom: 2rem; text-wrap: balance;
   }
-  .pool-card {
-    position: relative; border-radius: 24px; overflow: hidden;
-    box-shadow: 0 18px 40px rgba(19, 33, 71, 0.18);
+  .cta {
+    display: inline-block; text-decoration: none;
+    background: #fff; color: #132147; font-weight: 600;
+    padding: 0.9rem 1.6rem; border-radius: 14px;
+    box-shadow: 0 10px 28px rgba(10, 25, 55, 0.35);
   }
-  .pool-card canvas { display: block; width: 100%; height: 340px; }
-  .pool-label {
-    position: absolute; left: 1.4rem; bottom: 1.1rem;
+  .pool-label, .pool-note {
+    position: absolute; bottom: 1.4rem;
     color: rgba(255, 255, 255, 0.92); font-weight: 700;
     font-size: 14px; letter-spacing: 0.1em; text-transform: uppercase;
     font-stretch: expanded; pointer-events: none;
   }
-  .cta {
-    display: block; text-align: center; text-decoration: none;
-    background: var(--ink); color: var(--paper); font-weight: 500;
-    padding: 1rem; border-radius: 14px; margin-top: 1.4rem;
-  }
-  .hero-foot {
-    font-size: 13px; color: var(--ink-2); text-align: center;
-    margin: 0.8rem 0 3rem;
+  .pool-label { left: clamp(1.5rem, 5vw, 4rem); }
+  .pool-note {
+    right: clamp(1.5rem, 5vw, 4rem);
+    color: rgba(255, 255, 255, 0.6); font-weight: 600; font-size: 12px;
   }
 
-  /* Screenshots */
+  /* The paper below the water. */
+  main { display: flex; justify-content: center; }
+  .column { width: min(46rem, 100%); padding: 3.5rem 1.5rem 4rem; }
   .shots { display: flex; gap: 1.2rem; margin: 0 0 2.5rem; }
   .shots figure { width: calc(50% - 0.6rem); }
   .shots img {
@@ -71,7 +81,6 @@
     text-transform: uppercase; color: var(--ink-2);
     text-align: center; margin-top: 0.9rem;
   }
-
   section { border-top: 1px solid var(--hairline); padding: 1.4rem 0; }
   h2 {
     font-size: 12px; font-weight: 600; letter-spacing: 1.5px;
@@ -79,74 +88,82 @@
   }
   p + p { margin-top: 0.5rem; }
   a { color: inherit; }
-  .footnote { font-size: 13px; color: var(--ink-2); text-align: center; margin-top: 2.2rem; }
+  .cta-bottom {
+    display: block; text-align: center; text-decoration: none;
+    background: var(--ink); color: var(--paper); font-weight: 500;
+    padding: 1rem; border-radius: 14px; margin-top: 2rem;
+  }
+  .footnote { font-size: 13px; color: var(--ink-2); text-align: center; margin-top: 1rem; }
 </style>
 </head>
 <body>
-<main>
-  <header>
+<header class="hero">
+  <canvas id="pool" aria-label="A grand pool seen from above, toys drifting — one for every finished workout." role="img"></canvas>
+  <div class="hero-content">
     <p class="overline">Lido — for iPhone</p>
-    <h1>A workout timer<br>with a pool.</h1>
-    <div class="pool-card">
-      <canvas id="pool" aria-label="A pool seen from above, toys drifting — one for every finished workout." role="img"></canvas>
-      <span class="pool-label" id="month"></span>
-    </div>
+    <h1>A workout timer with a pool.</h1>
     <a class="cta" href="https://apps.apple.com/us/app/lido-workout-timer/id6787555002">Get Lido on the App&nbsp;Store</a>
-    <p class="hero-foot">Free. No account, no ads.</p>
-  </header>
-
-  <div class="shots">
-    <figure>
-      <img src="img/player.png" alt="A workout playing in Lido: big numerals counting down a plank, the screen filled with water.">
-      <figcaption>The program plays itself</figcaption>
-    </figure>
-    <figure>
-      <img src="img/home.png" alt="Lido's home screen: the July pool with eight toys afloat, above the workout library.">
-      <figcaption>Every finish floats a toy in</figcaption>
-    </figure>
   </div>
+  <span class="pool-label" id="month"></span>
+  <span class="pool-note">Free · No account, no ads</span>
+</header>
 
-  <section>
-    <h2>Timed workouts play themselves</h2>
-    <p>Write the program once. Lido runs it with voice cues — what's next,
-    halfway, five seconds left — so your phone stays in your pocket.</p>
-  </section>
+<main>
+  <div class="column">
+    <div class="shots">
+      <figure>
+        <img src="img/player.png" alt="A workout playing in Lido: big numerals counting down a plank, the screen filled with water.">
+        <figcaption>The program plays itself</figcaption>
+      </figure>
+      <figure>
+        <img src="img/home.png" alt="Lido's home screen: the July pool with eight toys afloat, above the workout library.">
+        <figcaption>Every finish floats a toy in</figcaption>
+      </figure>
+    </div>
 
-  <section>
-    <h2>Sets, counted for you</h2>
-    <p>For gym workouts you run yourself: tap when a set ends and Lido
-    times the rest, chiming when it's time to lift again.</p>
-  </section>
+    <section>
+      <h2>Timed workouts play themselves</h2>
+      <p>Write the program once. Lido runs it with voice cues — what's next,
+      halfway, five seconds left — so your phone stays in your pocket.</p>
+    </section>
 
-  <section>
-    <h2>The month keeps its own record</h2>
-    <p>Finish a workout and its toy drifts into the pool; a heavy month
-    earns a bigger one. Nothing counts streaks, and nothing is ever red
-    because you rested.</p>
-  </section>
+    <section>
+      <h2>Sets, counted for you</h2>
+      <p>For gym workouts you run yourself: tap when a set ends and Lido
+      times the rest, chiming when it's time to lift again.</p>
+    </section>
 
-  <section>
-    <h2>Share a workout</h2>
-    <p>Send a program to a friend as a link. It opens in their Lido,
-    ready to add.</p>
-  </section>
+    <section>
+      <h2>The month keeps its own record</h2>
+      <p>Finish a workout and its toy drifts into the pool; a heavy month
+      earns a bigger one. Nothing counts streaks, and nothing is ever red
+      because you rested.</p>
+    </section>
 
-  <section>
-    <h2>Support</h2>
-    <p>Questions or trouble? Write to
-    <a href="mailto:lidoworkoutapp@gmail.com">lidoworkoutapp@gmail.com</a>.</p>
-    <p>Lido keeps everything on your phone — no account, no ads, no
-    analytics. Shared workouts travel inside the link itself and never
-    touch a server.</p>
-  </section>
+    <section>
+      <h2>Share a workout</h2>
+      <p>Send a program to a friend as a link. It opens in their Lido,
+      ready to add.</p>
+    </section>
 
-  <p class="footnote">Made by Brandon Lukas.</p>
+    <section>
+      <h2>Support</h2>
+      <p>Questions or trouble? Write to
+      <a href="mailto:lidoworkoutapp@gmail.com">lidoworkoutapp@gmail.com</a>.</p>
+      <p>Lido keeps everything on your phone — no account, no ads, no
+      analytics. Shared workouts travel inside the link itself and never
+      touch a server.</p>
+    </section>
+
+    <a class="cta-bottom" href="https://apps.apple.com/us/app/lido-workout-timer/id6787555002">Get Lido on the App&nbsp;Store</a>
+    <p class="footnote">Made by Brandon Lukas.</p>
+  </div>
 </main>
 
 <script>
-// The hero pool: the app's scene, ported. Motion is a pure function of
-// time (same sinusoid drift as the app), so there is nothing to simulate
-// and a Reduce Motion visitor just gets one still frame.
+// The hero pool: the app's grand pool, ported. Motion is a pure function
+// of time (same sinusoid drift as the app), so there is nothing to
+// simulate and a Reduce Motion visitor just gets one still frame.
 (function () {
   var canvas = document.getElementById("pool");
   var ctx = canvas.getContext("2d");
@@ -158,19 +175,22 @@
 
   var WATER = "#3465ae", GROUT = "rgba(39, 80, 143, 0.55)", CHROME = "#edf3fa";
 
+  // Anchors keep clear of the top-left, where the poster's type sits.
   function floater(kind, ax, ay, amp, tempo, phase, scale, shiny) {
     return { kind: kind, ax: ax, ay: ay, amp: amp, s: scale, shiny: !!shiny,
              ripple: 8 + (phase % 7),
              w1: 0.09 * tempo, w2: 0.16 * tempo, p1: phase, p2: phase * 1.7 };
   }
   var toys = [
-    floater("duck",     0.17, 0.28, 34, 1.25, 0.9, 1),
-    floater("ball",     0.72, 0.20, 30, 1.0,  3.6, 1),
-    floater("ring",     0.40, 0.58, 30, 0.8,  5.1, 1),
-    floater("lilo",     0.86, 0.60, 22, 0.55, 2.2, 1),
-    floater("flamingo", 0.28, 0.78, 28, 0.7,  1.6, 1),
-    floater("orca",     0.57, 0.40, 32, 0.95, 4.4, 1),
-    floater("duck",     0.66, 0.80, 26, 1.15, 5.8, 0.9, true)
+    floater("duck",     0.70, 0.24, 34, 1.25, 0.9, 1),
+    floater("lilo",     0.88, 0.42, 24, 0.55, 2.2, 1),
+    floater("ball",     0.58, 0.52, 30, 1.0,  3.6, 1),
+    floater("orca",     0.34, 0.62, 32, 0.95, 4.4, 1),
+    floater("ring",     0.14, 0.76, 28, 0.8,  5.1, 1),
+    floater("flamingo", 0.47, 0.80, 28, 0.7,  1.6, 1),
+    floater("duck",     0.74, 0.76, 26, 1.15, 5.8, 0.9, true),
+    floater("ring",     0.90, 0.66, 22, 0.75, 2.9, 0.85),
+    floater("ball",     0.26, 0.44, 24, 1.05, 4.1, 0.85)
   ];
   var directional = { duck: 1, lilo: 1, flamingo: 1, orca: 1 };
 
@@ -330,9 +350,38 @@
     ctx.restore();
   }
 
+  function drawLadder(x, bottomEdge, w, h) {
+    var edge = bottomEdge ? h : 0, dir = bottomEdge ? -1 : 1;
+    ctx.lineCap = "round";
+    ctx.strokeStyle = "rgba(237,243,250,0.55)"; ctx.lineWidth = 3.4;
+    [x - 7, x + 7].forEach(function (rx) {
+      ctx.beginPath(); ctx.moveTo(rx, edge); ctx.lineTo(rx, edge + dir * 30); ctx.stroke();
+    });
+    ctx.strokeStyle = CHROME;
+    [x - 7, x + 7].forEach(function (rx) {
+      ctx.beginPath(); ctx.moveTo(rx, edge); ctx.lineTo(rx, edge + dir * 10); ctx.stroke();
+    });
+  }
+  function drawBoard(x) {
+    ctx.save(); ctx.translate(4, 6);
+    ctx.fillStyle = "rgba(0,0,0,0.13)";
+    ctx.beginPath(); ctx.roundRect(x - 8, -6, 16, 40, 5.5); ctx.fill();
+    ctx.restore();
+    ctx.fillStyle = "#f5f3ec";
+    ctx.beginPath(); ctx.roundRect(x - 8, -6, 16, 40, 5.5); ctx.fill();
+    ctx.strokeStyle = "rgba(0,0,0,0.14)"; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.roundRect(x - 8, -6, 16, 40, 5.5); ctx.stroke();
+    ctx.strokeStyle = "rgba(0,0,0,0.10)"; ctx.lineWidth = 1.2;
+    for (var i = 1; i <= 3; i++) {
+      ctx.beginPath(); ctx.moveTo(x - 5.5, i * 7); ctx.lineTo(x + 5.5, i * 7); ctx.stroke();
+    }
+  }
+
   function draw(t) {
     var w = canvas.clientWidth, h = canvas.clientHeight, dpr = devicePixelRatio || 1;
-    if (canvas.width !== w * dpr) { canvas.width = w * dpr; canvas.height = h * dpr; }
+    if (canvas.width !== w * dpr || canvas.height !== h * dpr) {
+      canvas.width = w * dpr; canvas.height = h * dpr;
+    }
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
     ctx.fillStyle = WATER; ctx.fillRect(0, 0, w, h);
@@ -341,9 +390,9 @@
     ctx.fillStyle = depth; ctx.fillRect(0, 0, w, h);
 
     // Caustic light and cloud shade drifting through.
-    var blobs = [[0.25, 0.35, 0.35, "rgba(255,255,255,0.09)"],
-                 [0.7, 0.6, 0.4, "rgba(255,255,255,0.07)"],
-                 [0.55, 0.2, 0.45, "rgba(21,45,84,0.18)"]];
+    var blobs = [[0.25, 0.35, 0.4, "rgba(255,255,255,0.09)"],
+                 [0.7, 0.6, 0.45, "rgba(255,255,255,0.07)"],
+                 [0.5, 0.15, 0.5, "rgba(21,45,84,0.18)"]];
     blobs.forEach(function (b, i) {
       var cx = b[0] * w + Math.sin(t / 41 + i * 2) * 16,
           cy = b[1] * h + Math.cos(t / 47 + i * 2) * 11, r = b[2] * h;
@@ -354,7 +403,7 @@
 
     // The grout grid, refracting slowly.
     ctx.strokeStyle = GROUT; ctx.lineWidth = 1.4;
-    var tile = 30, step = 12;
+    var tile = 34, step = 12;
     function wob(a, b) { return 1.8 * Math.sin(b / 17 + a / 41 + t * 0.55); }
     for (var x = -tile; x <= w + tile; x += tile) {
       ctx.beginPath();
@@ -367,17 +416,10 @@
       ctx.stroke();
     }
 
-    // Ladder over the top edge.
-    var lx = 0.14 * w;
-    ctx.lineCap = "round";
-    ctx.strokeStyle = "rgba(237,243,250,0.55)"; ctx.lineWidth = 3.4;
-    [lx - 7, lx + 7].forEach(function (rx) {
-      ctx.beginPath(); ctx.moveTo(rx, 0); ctx.lineTo(rx, 30); ctx.stroke();
-    });
-    ctx.strokeStyle = CHROME;
-    [lx - 7, lx + 7].forEach(function (rx) {
-      ctx.beginPath(); ctx.moveTo(rx, 0); ctx.lineTo(rx, 10); ctx.stroke();
-    });
+    // The grand pool's fixtures: near ladder, far ladder, diving board.
+    drawLadder(0.32 * w, false, w, h);
+    drawLadder(0.56 * w, true, w, h);
+    drawBoard(0.68 * w);
 
     toys.forEach(function (f) {
       var p = pos(f, t, w, h);
