@@ -1,0 +1,12 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["35N7AD5BPB.com.brandonlukas.swisstime"],
+        "components": [
+          { "/": "/lido/w*", "comment": "Shared Lido workouts" }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A Lido workout</title>
+<!-- The workout rides in the URL fragment and never reaches a server.
+     This page is the fallback face for someone without Lido installed;
+     a phone with Lido opens the app directly and never loads it. -->
+<meta property="og:title" content="A Lido workout">
+<meta property="og:description" content="Someone shared a workout with you. Open it in Lido to add it to your pool.">
+<style>
+  :root {
+    --paper: #e9edf3; --ink: #132147; --ink-2: rgba(19, 33, 71, 0.66);
+    --hairline: rgba(19, 33, 71, 0.12); --card: #f7f9fd;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #101528; --ink: #e6ecf7; --ink-2: rgba(230, 236, 247, 0.66);
+      --hairline: rgba(230, 236, 247, 0.14); --card: #171d33;
+    }
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--paper); color: var(--ink);
+    font: 17px/1.45 -apple-system, "Helvetica Neue", system-ui, sans-serif;
+    display: flex; justify-content: center; min-height: 100vh;
+  }
+  main { width: min(34rem, 100%); padding: 3rem 1.5rem 4rem; }
+  .overline {
+    font-size: 12px; font-weight: 600; letter-spacing: 1.5px;
+    text-transform: uppercase; color: var(--ink-2); margin-bottom: 1.6rem;
+  }
+  h1 {
+    font-size: 2rem; font-weight: 800; text-transform: uppercase;
+    letter-spacing: 0.05em; font-stretch: expanded;
+    padding-bottom: 0.8rem; border-bottom: 1px solid var(--ink);
+    margin-bottom: 0.8rem;
+  }
+  .details { color: var(--ink-2); margin-bottom: 0.5rem; }
+  .summary { margin-bottom: 0.6rem; }
+  ol { list-style: none; margin-top: 0.4rem; }
+  li {
+    display: flex; gap: 0.8rem; align-items: baseline;
+    padding: 1rem 0; border-top: 1px solid var(--hairline);
+  }
+  li:first-child { border-top: none; }
+  .num {
+    font-size: 12px; font-weight: 600; letter-spacing: 1.5px;
+    color: #5560c4; min-width: 1.9rem;
+    font-variant-numeric: tabular-nums;
+  }
+  .name { font-weight: 500; flex: 1; }
+  .trail { font-variant-numeric: tabular-nums; }
+  .cta {
+    display: block; text-align: center; text-decoration: none;
+    background: var(--ink); color: var(--paper); font-weight: 500;
+    padding: 1rem; border-radius: 14px; margin-top: 2rem;
+  }
+  .footnote { font-size: 13px; color: var(--ink-2); margin-top: 1rem; }
+  .empty { color: var(--ink-2); }
+</style>
+</head>
+<body>
+<main>
+  <p class="overline">Shared from Lido</p>
+  <div id="workout">
+    <p class="empty">This link doesn't seem to hold a workout.</p>
+  </div>
+  <!-- TODO(brandon): replace with the real App Store URL for Lido. -->
+  <a class="cta" href="https://apps.apple.com/app/id0000000000">Get Lido on the App&nbsp;Store</a>
+  <p class="footnote">Lido opens links like this one directly — with the app
+  installed, you'd already be looking at it.</p>
+</main>
+<script>
+(function () {
+  function mmss(s) {
+    s = Math.max(0, Math.floor(s));
+    return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0");
+  }
+  function el(tag, cls, text) {
+    var node = document.createElement(tag);
+    if (cls) node.className = cls;
+    if (text != null) node.textContent = text; // textContent only — the payload is untrusted
+    return node;
+  }
+  try {
+    var fragment = location.hash.slice(1);
+    if (!fragment) return;
+    var b64 = fragment.replace(/-/g, "+").replace(/_/g, "/");
+    b64 += "=".repeat((4 - (b64.length % 4)) % 4);
+    var workout = JSON.parse(atob(b64));
+    var exercises = (workout.items || []).slice(0, 100);
+    if (!workout.title && exercises.length === 0) return;
+
+    var box = document.getElementById("workout");
+    box.replaceChildren();
+    box.appendChild(el("h1", null, workout.title || "Workout"));
+    if (workout.details) box.appendChild(el("p", "details", workout.details));
+
+    var sets = exercises.reduce(function (t, x) { return t + Math.max(1, x.sets || 1); }, 0);
+    var kind = workout.kind === "untimed" ? "Sets" : "Timed";
+    box.appendChild(el("p", "summary",
+      kind + " · " + exercises.length + " exercise" + (exercises.length === 1 ? "" : "s")
+      + (workout.kind === "untimed" ? " · " + sets + " set" + (sets === 1 ? "" : "s") : "")));
+
+    var list = el("ol");
+    exercises.forEach(function (x, i) {
+      var row = el("li");
+      row.appendChild(el("span", "num", String(i + 1).padStart(2, "0")));
+      var mid = el("span", "name", x.name || "Exercise");
+      row.appendChild(mid);
+      var trail = x.mode === "sets"
+        ? (x.reps ? (x.sets || 4) + " × " + x.reps
+                  : (x.sets || 4) + " set" + ((x.sets || 4) === 1 ? "" : "s"))
+        : mmss(x.duration || 60);
+      row.appendChild(el("span", "trail", trail));
+      list.appendChild(row);
+    });
+    box.appendChild(list);
+  } catch (e) { /* the empty-state line stays */ }
+})();
+</script>
+</body>
+</html>
