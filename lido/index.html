@@ -11,12 +11,12 @@
 <style>
   :root {
     --paper: #e9edf3; --ink: #132147; --ink-2: rgba(19, 33, 71, 0.66);
-    --hairline: rgba(19, 33, 71, 0.12); --card: #f7f9fd;
+    --hairline: rgba(19, 33, 71, 0.12);
   }
   @media (prefers-color-scheme: dark) {
     :root {
       --paper: #101528; --ink: #e6ecf7; --ink-2: rgba(230, 236, 247, 0.66);
-      --hairline: rgba(230, 236, 247, 0.14); --card: #171d33;
+      --hairline: rgba(230, 236, 247, 0.14);
     }
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -25,18 +25,44 @@
     font: 17px/1.5 -apple-system, "Helvetica Neue", system-ui, sans-serif;
     display: flex; justify-content: center;
   }
-  main { width: min(44rem, 100%); padding: 3.5rem 1.5rem 4rem; }
-  h1 {
-    font-size: 3rem; font-weight: 800; text-transform: uppercase;
-    letter-spacing: 0.06em; font-stretch: expanded;
-    padding-bottom: 1rem; border-bottom: 1px solid var(--ink);
-    margin-bottom: 1rem;
+  main { width: min(46rem, 100%); padding: 3rem 1.5rem 4rem; }
+
+  /* Hero */
+  .overline {
+    font-size: 12px; font-weight: 600; letter-spacing: 1.5px;
+    text-transform: uppercase; color: var(--ink-2); margin-bottom: 1.2rem;
   }
-  .tagline { font-size: 1.25rem; margin-bottom: 2.5rem; }
+  h1 {
+    font-size: clamp(2.1rem, 7vw, 3.4rem); line-height: 1.08;
+    font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em;
+    font-stretch: expanded; margin-bottom: 1.8rem;
+  }
+  .pool-card {
+    position: relative; border-radius: 24px; overflow: hidden;
+    box-shadow: 0 18px 40px rgba(19, 33, 71, 0.18);
+  }
+  .pool-card canvas { display: block; width: 100%; height: 340px; }
+  .pool-label {
+    position: absolute; left: 1.4rem; bottom: 1.1rem;
+    color: rgba(255, 255, 255, 0.92); font-weight: 700;
+    font-size: 14px; letter-spacing: 0.1em; text-transform: uppercase;
+    font-stretch: expanded; pointer-events: none;
+  }
+  .cta {
+    display: block; text-align: center; text-decoration: none;
+    background: var(--ink); color: var(--paper); font-weight: 500;
+    padding: 1rem; border-radius: 14px; margin-top: 1.4rem;
+  }
+  .hero-foot {
+    font-size: 13px; color: var(--ink-2); text-align: center;
+    margin: 0.8rem 0 3rem;
+  }
+
+  /* Sections */
   .shots { display: flex; gap: 1rem; margin: 0 0 2.5rem; }
   .shots img {
     width: calc(50% - 0.5rem); border-radius: 18px;
-    border: 1px solid var(--hairline); display: block;
+    border: 1px solid var(--hairline); display: block; height: auto;
   }
   section { border-top: 1px solid var(--hairline); padding: 1.4rem 0; }
   h2 {
@@ -45,18 +71,21 @@
   }
   p + p { margin-top: 0.5rem; }
   a { color: inherit; }
-  .cta {
-    display: block; text-align: center; text-decoration: none;
-    background: var(--ink); color: var(--paper); font-weight: 500;
-    padding: 1rem; border-radius: 14px; margin: 2rem 0 0.8rem;
-  }
-  .footnote { font-size: 13px; color: var(--ink-2); text-align: center; }
+  .footnote { font-size: 13px; color: var(--ink-2); text-align: center; margin-top: 2.2rem; }
 </style>
 </head>
 <body>
 <main>
-  <h1>Lido</h1>
-  <p class="tagline">A workout timer with a pool.</p>
+  <header>
+    <p class="overline">Lido — for iPhone</p>
+    <h1>A workout timer<br>with a pool.</h1>
+    <div class="pool-card">
+      <canvas id="pool" aria-label="A pool seen from above, toys drifting — one for every finished workout." role="img"></canvas>
+      <span class="pool-label" id="month"></span>
+    </div>
+    <a class="cta" href="https://apps.apple.com/us/app/lido-workout-timer/id6787555002">Get Lido on the App&nbsp;Store</a>
+    <p class="hero-foot">Free. No account, no ads.</p>
+  </header>
 
   <div class="shots">
     <img src="img/workout.png" alt="A workout in Lido: a numbered program sheet with a Start button.">
@@ -92,15 +121,194 @@
   <section>
     <h2>Support</h2>
     <p>Questions or trouble? Write to
-    <a href="mailto:brandonlukas@gmail.com">brandonlukas@gmail.com</a>.</p>
+    <a href="mailto:lidoworkoutapp@gmail.com">lidoworkoutapp@gmail.com</a>.</p>
     <p>Lido keeps everything on your phone — no account, no ads, no
     analytics. Shared workouts travel inside the link itself and never
     touch a server.</p>
   </section>
 
-  <!-- TODO(brandon): replace with the real App Store URL for Lido. -->
-  <a class="cta" href="https://apps.apple.com/app/id0000000000">Get Lido on the App&nbsp;Store</a>
-  <p class="footnote">Free. Made by Brandon Lukas.</p>
+  <p class="footnote">Made by Brandon Lukas.</p>
 </main>
+
+<script>
+// The hero pool: the app's scene, ported. Motion is a pure function of
+// time (same sinusoid drift as the app), so there is nothing to simulate
+// and a Reduce Motion visitor just gets one still frame.
+(function () {
+  var canvas = document.getElementById("pool");
+  var ctx = canvas.getContext("2d");
+  var stillPose = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  document.getElementById("month").textContent =
+    new Date().toLocaleString("en", { month: "long" });
+
+  var WATER = "#3465ae", DEEP = "#27508f", GROUT = "rgba(39, 80, 143, 0.55)",
+      CHROME = "#edf3fa";
+
+  // anchor (unit), amplitude (px), angular speeds (rad/s), phases.
+  function floater(kind, ax, ay, amp, tempo, phase, scale) {
+    return { kind: kind, ax: ax, ay: ay, amp: amp, s: scale,
+             w1: 0.08 * tempo, w2: 0.15 * tempo, p1: phase, p2: phase * 1.7 };
+  }
+  var toys = [
+    floater("duck", 0.20, 0.32, 26, 1.2, 0.9, 1),
+    floater("ball", 0.74, 0.24, 22, 1.0, 3.6, 1),
+    floater("ring", 0.46, 0.64, 24, 0.75, 5.1, 1),
+    floater("lilo", 0.85, 0.66, 18, 0.5, 2.2, 1),
+    floater("duck", 0.60, 0.46, 20, 1.1, 4.4, 0.85)
+  ];
+
+  function pos(f, t, w, h) {
+    return {
+      x: f.ax * w + f.amp * (Math.sin(f.w1 * t + f.p1) + 0.4 * Math.sin(f.w2 * t + f.p2)),
+      y: f.ay * h + f.amp * (Math.cos(f.w1 * 0.9 * t + f.p2) + 0.4 * Math.sin(f.w2 * 1.1 * t + f.p1))
+    };
+  }
+  function heading(f, t) {
+    var dx = f.w1 * Math.cos(f.w1 * t + f.p1) + 0.4 * f.w2 * Math.cos(f.w2 * t + f.p2);
+    var dy = -f.w1 * 0.9 * Math.sin(f.w1 * 0.9 * t + f.p2) + 0.4 * f.w2 * 1.1 * Math.cos(f.w2 * 1.1 * t + f.p1);
+    return Math.atan2(dy, dx);
+  }
+
+  function silhouette(kind) {
+    ctx.beginPath();
+    if (kind === "duck") {
+      ctx.ellipse(-1, 0, 12, 8, 0, 0, 7);
+      ctx.moveTo(17, 0); ctx.arc(12, 0, 5.5, 0, 7);
+    } else if (kind === "ball") { ctx.arc(0, 0, 13, 0, 7); }
+    else if (kind === "ring") { ctx.arc(0, 0, 13.5, 0, 7); }
+    else { roundRect(-17, -10, 34, 20, 5); }
+    ctx.fill();
+  }
+  function roundRect(x, y, w, h, r) {
+    ctx.beginPath(); ctx.roundRect(x, y, w, h, r);
+  }
+  function drawToy(kind) {
+    if (kind === "duck") {
+      ctx.fillStyle = "#d9a323";                       // tail + shade
+      ctx.beginPath(); ctx.moveTo(-9, -3.6); ctx.lineTo(-15.5, 0); ctx.lineTo(-9, 3.6); ctx.fill();
+      ctx.fillStyle = "#eebc3a";                       // hull
+      ctx.beginPath(); ctx.ellipse(-1, 0, 12, 8, 0, 0, 7); ctx.fill();
+      ctx.save(); ctx.beginPath(); ctx.ellipse(-1, 0, 12, 8, 0, 0, 7); ctx.clip();
+      ctx.fillStyle = "rgba(180, 130, 20, 0.45)"; ctx.fillRect(-13, 0, 26, 8); ctx.restore();
+      ctx.fillStyle = "#eebc3a";                       // head
+      ctx.beginPath(); ctx.arc(12, 0, 5.5, 0, 7); ctx.fill();
+      ctx.fillStyle = "#e07a2f";                       // beak
+      ctx.beginPath(); ctx.moveTo(16, -2.4); ctx.lineTo(21.5, 0); ctx.lineTo(16, 2.4); ctx.fill();
+      ctx.fillStyle = "#20242b";                       // eyes
+      ctx.beginPath(); ctx.arc(12.4, -3.2, 1.1, 0, 7); ctx.arc(12.4, 3.2, 1.1, 0, 7); ctx.fill();
+      ctx.fillStyle = "rgba(255,255,255,0.55)";        // catch-light
+      ctx.beginPath(); ctx.ellipse(9.5, -3.4, 1.9, 1.1, 0, 0, 7); ctx.fill();
+    } else if (kind === "ball") {
+      var panels = ["#fff", "#c9504a", "#fff", "#3b5fa8", "#fff", "#e2b23c"];
+      for (var i = 0; i < 6; i++) {
+        ctx.fillStyle = panels[i];
+        ctx.beginPath(); ctx.moveTo(0, 0);
+        ctx.arc(0, 0, 13, i * Math.PI / 3, (i + 1) * Math.PI / 3); ctx.fill();
+      }
+      ctx.fillStyle = "#fff"; ctx.beginPath(); ctx.arc(0, 0, 3.2, 0, 7); ctx.fill();
+      ctx.fillStyle = "rgba(255,255,255,0.5)";
+      ctx.beginPath(); ctx.ellipse(-5, -7.5, 3, 1.8, 0, 0, 7); ctx.fill();
+    } else if (kind === "ring") {
+      ctx.fillStyle = "#fff";
+      ctx.beginPath(); ctx.arc(0, 0, 13.5, 0, 7); ctx.arc(0, 0, 7, 0, 7, true); ctx.fill();
+      ctx.save();
+      ctx.beginPath(); ctx.arc(0, 0, 13.5, 0, 7); ctx.arc(0, 0, 7, 0, 7, true); ctx.clip();
+      ctx.fillStyle = "#c9504a";
+      for (var a = Math.PI / 8; a < 2 * Math.PI; a += Math.PI / 2) {
+        ctx.beginPath(); ctx.moveTo(0, 0); ctx.arc(0, 0, 15, a, a + Math.PI / 4); ctx.fill();
+      }
+      ctx.restore();
+      ctx.strokeStyle = "rgba(32,36,43,0.12)"; ctx.lineWidth = 1.2;
+      ctx.beginPath(); ctx.arc(0, 0, 7, 0, 7); ctx.stroke();
+      ctx.fillStyle = "rgba(255,255,255,0.7)";
+      ctx.beginPath(); ctx.ellipse(-6, -9, 3.5, 1.8, 0, 0, 7); ctx.fill();
+    } else { // lilo
+      ctx.fillStyle = "#eef3f8"; roundRect(-17, -10, 34, 20, 5); ctx.fill();
+      ctx.save(); roundRect(-17, -10, 34, 20, 5); ctx.clip();
+      ctx.strokeStyle = "rgba(52,101,174,0.5)"; ctx.lineWidth = 1.3;
+      for (var y = -5; y <= 5; y += 5) {
+        ctx.beginPath(); ctx.moveTo(-17, y); ctx.lineTo(12, y); ctx.stroke();
+      }
+      ctx.fillStyle = "rgba(52,101,174,0.35)"; ctx.fillRect(12, -10, 5.5, 20);
+      ctx.restore();
+      ctx.strokeStyle = "rgba(52,101,174,0.45)"; ctx.lineWidth = 1.2;
+      roundRect(-17, -10, 34, 20, 5); ctx.stroke();
+      ctx.fillStyle = "rgba(255,255,255,0.8)";
+      ctx.beginPath(); ctx.ellipse(-8, -6.5, 4, 1.7, 0, 0, 7); ctx.fill();
+    }
+  }
+
+  function draw(t) {
+    var w = canvas.clientWidth, h = canvas.clientHeight, dpr = devicePixelRatio || 1;
+    if (canvas.width !== w * dpr) { canvas.width = w * dpr; canvas.height = h * dpr; }
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    ctx.fillStyle = WATER; ctx.fillRect(0, 0, w, h);
+    var depth = ctx.createRadialGradient(w / 2, h / 2, h * 0.3, w / 2, h / 2, w * 0.75);
+    depth.addColorStop(0, "rgba(0,0,0,0)"); depth.addColorStop(1, "rgba(21,45,84,0.45)");
+    ctx.fillStyle = depth; ctx.fillRect(0, 0, w, h);
+
+    // Caustic light and cloud shade drifting through.
+    var blobs = [[0.25, 0.35, 0.35, "rgba(255,255,255,0.07)"],
+                 [0.7, 0.6, 0.4, "rgba(255,255,255,0.06)"],
+                 [0.55, 0.2, 0.45, "rgba(21,45,84,0.16)"]];
+    blobs.forEach(function (b, i) {
+      var cx = b[0] * w + Math.sin(t / 47 + i * 2) * 12,
+          cy = b[1] * h + Math.cos(t / 53 + i * 2) * 8, r = b[2] * h;
+      var g = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+      g.addColorStop(0, b[3]); g.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, cy, r, 0, 7); ctx.fill();
+    });
+
+    // The grout grid, refracting slowly.
+    ctx.strokeStyle = GROUT; ctx.lineWidth = 1.4;
+    var tile = 30, step = 12;
+    function wob(a, b) { return 1.8 * Math.sin(b / 17 + a / 41 + t * 0.55); }
+    for (var x = -tile; x <= w + tile; x += tile) {
+      ctx.beginPath();
+      for (var y = 0; y <= h + step; y += step) ctx.lineTo(x + wob(x, y), y);
+      ctx.stroke();
+    }
+    for (var y2 = -tile; y2 <= h + tile; y2 += tile) {
+      ctx.beginPath();
+      for (var x2 = 0; x2 <= w + step; x2 += step) ctx.lineTo(x2, y2 + wob(y2, x2));
+      ctx.stroke();
+    }
+
+    // Ladder over the top edge.
+    var lx = 0.16 * w;
+    ctx.lineCap = "round";
+    ctx.strokeStyle = "rgba(237,243,250,0.55)"; ctx.lineWidth = 3.4;
+    [lx - 7, lx + 7].forEach(function (rx) {
+      ctx.beginPath(); ctx.moveTo(rx, 0); ctx.lineTo(rx, 30); ctx.stroke();
+    });
+    ctx.strokeStyle = CHROME;
+    [lx - 7, lx + 7].forEach(function (rx) {
+      ctx.beginPath(); ctx.moveTo(rx, 0); ctx.lineTo(rx, 10); ctx.stroke();
+    });
+
+    toys.forEach(function (f) {
+      var p = pos(f, t, w, h);
+      var rot = (f.kind === "duck" || f.kind === "lilo")
+        ? heading(f, t) : t * 0.06 + f.p1;
+      ctx.save(); ctx.translate(p.x + 5 * f.s, p.y + 7 * f.s);
+      ctx.rotate(rot); ctx.scale(f.s, f.s);
+      ctx.fillStyle = "rgba(0,0,0,0.13)"; silhouette(f.kind);
+      ctx.restore();
+      ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(rot); ctx.scale(f.s, f.s);
+      drawToy(f.kind);
+      ctx.restore();
+    });
+  }
+
+  if (stillPose) { draw(137); return; }
+  var last = 0;
+  (function frame(now) {
+    if (now - last > 41) { last = now; draw(now / 1000); } // ~24fps
+    requestAnimationFrame(frame);
+  })(0);
+})();
+</script>
 </body>
 </html>
