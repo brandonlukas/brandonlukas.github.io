@@ -72,7 +72,7 @@
   installed, you'd already be looking at it.</p>
 </main>
 <script>
-(function () {
+(async function () {
   function mmss(s) {
     s = Math.max(0, Math.floor(s));
     return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0");
@@ -83,12 +83,23 @@
     if (text != null) node.textContent = text; // textContent only — the payload is untrusted
     return node;
   }
+  // The app deflates the payload (raw DEFLATE, no zlib wrapper) to keep
+  // links short enough for Messages; early links were plain JSON, so
+  // inflation failure falls back to reading the bytes as-is.
+  async function inflate(bytes) {
+    try {
+      var stream = new Blob([bytes]).stream()
+        .pipeThrough(new DecompressionStream("deflate-raw"));
+      return new Uint8Array(await new Response(stream).arrayBuffer());
+    } catch (e) { return bytes; }
+  }
   try {
     var fragment = location.hash.slice(1);
     if (!fragment) return;
     var b64 = fragment.replace(/-/g, "+").replace(/_/g, "/");
     b64 += "=".repeat((4 - (b64.length % 4)) % 4);
-    var workout = JSON.parse(atob(b64));
+    var bytes = Uint8Array.from(atob(b64), function (c) { return c.charCodeAt(0); });
+    var workout = JSON.parse(new TextDecoder().decode(await inflate(bytes)));
     var exercises = (workout.items || []).slice(0, 100);
     if (!workout.title && exercises.length === 0) return;
 
