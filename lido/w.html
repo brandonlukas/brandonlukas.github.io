@@ -94,8 +94,11 @@
     } catch (e) { return bytes; }
   }
   try {
+    // Same inbound cap as the app: real payloads are a few hundred
+    // chars; anything huge is junk, and capping it here also bounds
+    // what DecompressionStream can be made to inflate.
     var fragment = location.hash.slice(1);
-    if (!fragment) return;
+    if (!fragment || fragment.length > 4000) return;
     var b64 = fragment.replace(/-/g, "+").replace(/_/g, "/");
     b64 += "=".repeat((4 - (b64.length % 4)) % 4);
     var bytes = Uint8Array.from(atob(b64), function (c) { return c.charCodeAt(0); });
