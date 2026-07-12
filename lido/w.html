@@ -112,7 +112,7 @@
     if (workout.details) box.appendChild(el("p", "details", workout.details));
 
     var sets = exercises.reduce(function (t, x) { return t + Math.max(1, x.sets || 1); }, 0);
-    var kind = workout.kind === "untimed" ? "Sets" : "Timed";
+    var kind = workout.kind === "untimed" ? "Untimed" : "Timed";
     box.appendChild(el("p", "summary",
       kind + " · " + exercises.length + " exercise" + (exercises.length === 1 ? "" : "s")
       + (workout.kind === "untimed" ? " · " + sets + " set" + (sets === 1 ? "" : "s") : "")));
