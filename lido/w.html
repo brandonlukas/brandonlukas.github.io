@@ -111,7 +111,9 @@
     box.appendChild(el("h1", null, workout.title || "Workout"));
     if (workout.details) box.appendChild(el("p", "details", workout.details));
 
-    var sets = exercises.reduce(function (t, x) { return t + Math.max(1, x.sets || 1); }, 0);
+    // Omitted fields mean "the app's default" — sets defaults to 4,
+    // exactly as the per-row trail below reads it.
+    var sets = exercises.reduce(function (t, x) { return t + Math.max(1, x.sets || 4); }, 0);
     var kind = workout.kind === "untimed" ? "Untimed" : "Timed";
     box.appendChild(el("p", "summary",
       kind + " · " + exercises.length + " exercise" + (exercises.length === 1 ? "" : "s")
